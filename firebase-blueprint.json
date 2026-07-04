@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "Resposta": {
+      "title": "Resposta",
+      "description": "Uma resposta de convite para encontro romântico",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID único da resposta (ex: resp_173827362)"
+        },
+        "nome": {
+          "type": "string",
+          "description": "Nome de quem respondeu"
+        },
+        "lugar": {
+          "type": "string",
+          "description": "Lugar escolhido para o date"
+        },
+        "data": {
+          "type": "string",
+          "description": "Data formatada do date (DD/MM/YYYY)"
+        },
+        "hora": {
+          "type": "string",
+          "description": "Horário ideal do date"
+        },
+        "rawDate": {
+          "type": "string",
+          "description": "Data original no formato YYYY-MM-DD"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "String legível de data/hora de criação local"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["ativo", "lixeira"],
+          "description": "Status da resposta (ativo ou lixeira)"
+        },
+        "criadoEm": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp de criação no Firestore"
+        },
+        "atualizadoEm": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp de última atualização no Firestore"
+        }
+      },
+      "required": ["id", "nome", "lugar", "data", "hora", "status", "criadoEm", "atualizadoEm"]
+    }
+  },
+  "firestore": {
+    "respostas": {
+      "schema": "Resposta",
+      "description": "Coleção de respostas do Painel do Cupido"
+    }
+  }
+}

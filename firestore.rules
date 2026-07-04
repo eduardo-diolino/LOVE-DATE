@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper: Valid ID check
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Helper: validation for Resposta entity
+    function isValidResposta(data) {
+      return data.keys().hasAll(['id', 'nome', 'lugar', 'data', 'hora', 'status', 'criadoEm', 'atualizadoEm'])
+        && data.keys().size() >= 8
+        && data.id is string && data.id.size() <= 128
+        && data.nome is string && data.nome.size() <= 200
+        && data.lugar is string && data.lugar.size() <= 500
+        && data.data is string && data.data.size() <= 30
+        && data.hora is string && data.hora.size() <= 10
+        && (data.status == 'ativo' || data.status == 'lixeira');
+    }
+
+    match /respostas/{respostaId} {
+      allow read, write: if true;
+    }
+  }
+}

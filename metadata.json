@@ -1,0 +1,6 @@
+{
+  "name": "Pedido de Date",
+  "description": "Uma página interativa e divertida para convidar alguém especial para um encontro, contendo botões interativos e download do código autônomo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quer ir em um date comigo? 🥺❤️</title>
+    <link rel="preload" href="/celebration.mp4" as="video" type="video/mp4">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffe6ea;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Ambient floating elements */
+        .bg-decor {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.6;
+        }
+
+        .bg-decor-heart {
+            position: absolute;
+            color: #ffccd5;
+            font-size: 38px;
+            animation: floatSlow 8s infinite ease-in-out;
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-25px) rotate(15deg); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(255, 77, 109, 0.25);
+            padding: 3.5rem 2.5rem;
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            z-index: 10;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .emoji-header {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: pulseEmoji 2s infinite ease-in-out;
+            display: inline-block;
+        }
+
+        @keyframes pulseEmoji {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        h1 {
+            color: #590d22;
+            font-size: 2.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.025em;
+        }
+
+        .subtitle {
+            color: #ff4d6d;
+            margin-bottom: 2.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            min-height: 60px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 0.9rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-yes {
+            background-color: #ff4d6d;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(255, 77, 109, 0.4);
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.08);
+            background-color: #ff758f;
+        }
+
+        .btn-no {
+            background-color: #e2e8f0;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            position: relative;
+            z-index: 20;
+            transition: none !important;
+        }
+
+        .btn-primary {
+            background-color: #ff4d6d;
+            color: white;
+            width: 100%;
+            box-shadow: 0 10px 15px -3px rgba(255, 77, 109, 0.3);
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary:hover {
+            background-color: #ff1a43;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -3px rgba(255, 77, 109, 0.5);
+        }
+
+        @keyframes fadeInVideo {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Video Container - Fullscreen when active */
+        #screen-video.active {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2.5rem 1.5rem;
+            box-sizing: border-box;
+            overflow: hidden;
+            animation: fadeInVideo 0.15s ease-out forwards;
+        }
+
+        .video-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            border-radius: 0;
+            border: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            pointer-events: auto;
+        }
+
+        /* Overlay/Vignette for text readability */
+        .overlay-vignette {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.7) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .content-overlay {
+            position: relative;
+            z-index: 3;
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .content-overlay * {
+            pointer-events: auto;
+        }
+
+        #screen-video.active h1 {
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+        }
+
+        #screen-video.active .subtitle {
+            color: #ff4d6d;
+            font-weight: 800;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Form styling */
+        .form-group {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #590d22;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border-radius: 1rem;
+            border: 2px solid #ffccd5;
+            background-color: #fff;
+            color: #590d22;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #ff4d6d;
+            box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.15);
+        }
+
+        .form-select-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            width: 100%;
+        }
+
+        .form-select-card {
+            border: 2px solid #ffccd5;
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            cursor: pointer;
+            font-weight: 700;
+            color: #590d22;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-select-card.selected {
+            border-color: #ff4d6d;
+            background-color: #ffe6ea;
+            transform: scale(1.02);
+        }
+
+        .form-select-card span.icon {
+            font-size: 2rem;
+        }
+
+        /* Heart rain shower */
+        .heart-shower {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .falling-heart {
+            position: absolute;
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: heartFall linear forwards;
+        }
+
+        @keyframes heartFall {
+            0% {
+                transform: translateY(-10vh) scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Admin Section Styling */
+        .admin-modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(89, 13, 34, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .admin-box {
+            background: white;
+            border-radius: 2rem;
+            width: 100%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+            border: 3px solid #ffccd5;
+        }
+
+        .admin-header {
+            background-color: #ffe6ea;
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid #ffccd5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h2 {
+            color: #590d22;
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-close {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: #d93856;
+            cursor: pointer;
+            outline: none;
+            font-weight: bold;
+        }
+
+        .admin-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .admin-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .admin-tab.active {
+            color: #ff4d6d;
+            border-bottom-color: #ff4d6d;
+            background: white;
+        }
+
+        .admin-content {
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .response-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .response-card:hover {
+            border-color: #ffccd5;
+            transform: translateY(-2px);
+        }
+
+        .response-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .response-id {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-family: monospace;
+        }
+
+        .response-date-sub {
+            font-size: 0.8rem;
+            color: #ff4d6d;
+            font-weight: 700;
+        }
+
+        .response-detail {
+            color: #590d22;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .response-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+
+        .action-btn {
+            padding: 0.4rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-edit {
+            background-color: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-edit:hover {
+            background-color: #cbd5e1;
+        }
+
+        .btn-delete {
+            background-color: #ffe6ea;
+            color: #ff4d6d;
+        }
+
+        .btn-delete:hover {
+            background-color: #ffccd5;
+        }
+
+        .btn-restore {
+            background-color: #dcfce7;
+            color: #15803d;
+        }
+
+        .btn-restore:hover {
+            background-color: #bbf7d0;
+        }
+
+        .btn-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .btn-danger:hover {
+            background-color: #fca5a5;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #64748b;
+            padding: 3rem 1rem;
+            font-weight: 600;
+        }
+
+        .empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Shortcut tip */
+        .shortcut-tip {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px 12px;
+            border-radius: 9999px;
+            border: 1px solid #ffccd5;
+            font-size: 0.75rem;
+            color: #590d22;
+            font-weight: 600;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Editing mode fields */
+        .edit-input-group {
+            margin-top: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.5rem;
+            border: 1.5px solid #ffccd5;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #590d22;
+            outline: none;
+        }
+
+        .edit-input:focus {
+            border-color: #ff4d6d;
+        }
+    </style>
+    <!-- Google Fonts for premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Ambient floating items -->
+    <div class="bg-decor">
+        <span class="bg-decor-heart" style="top: 10%; left: 10%; animation-delay: 0s;">🌸</span>
+        <span class="bg-decor-heart" style="bottom: 20%; right: 20%; animation-delay: 2s; font-size: 48px;">💖</span>
+        <span class="bg-decor-heart" style="top: 25%; right: 10%; animation-delay: 4s; font-size: 32px;">✨</span>
+        <span class="bg-decor-heart" style="bottom: 25%; left: 10%; animation-delay: 1s; font-size: 40px;">🌷</span>
+    </div>
+
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <div class="container" id="main-card">
+        
+        <!-- SCREEN 1: PROPOSAL -->
+        <div class="screen active" id="screen-proposal">
+            <span class="emoji-header">💌</span>
+            <h1>Quer ir em um date comigo? 🥺</h1>
+            <p class="subtitle">Prometo que vai ser inesquecível!</p>
+            <div class="buttons">
+                <button class="btn btn-yes" id="btn-yes">SIM</button>
+                <button class="btn btn-no" id="btn-no">NÃO</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: PLANNING FORM -->
+        <div class="screen" id="screen-planning">
+            <span class="emoji-header">📅🗺️</span>
+            <h1 style="margin-bottom: 0.5rem; font-size: 1.8rem;">O Nosso Encontro</h1>
+            <p class="subtitle" style="margin-bottom: 2rem;">Personalize os detalhes especiais!</p>
+            
+            <form id="planning-form" style="width: 100%;">
+                <div class="form-group">
+                    <label>Para onde vamos?</label>
+                    <div class="form-select-grid" id="place-options">
+                        <div class="form-select-card selected" data-value="Jantar Romântico">
+                            <span class="icon">🍝</span>
+                            <span>Jantar</span>
+                        </div>
+                        <div class="form-select-card" data-value="Cafeteria Aconchegante">
+                            <span class="icon">☕</span>
+                            <span>Café</span>
+                        </div>
+                        <div class="form-select-card" data-value="Cinema & Pipoca">
+                            <span class="icon">🍿</span>
+                            <span>Cinema</span>
+                        </div>
+                        <div class="form-select-card" data-value="Passeio no Parque">
+                            <span class="icon">🧺</span>
+                            <span>Passeio</span>
+                        </div>
+                    </div>
+                    <input type="text" id="custom-place" class="form-control" style="margin-top: 0.75rem;" placeholder="Ou digite outro lugar que gostaria de ir">
+                </div>
+
+                <div class="form-group">
+                    <label for="date-input">Melhor dia</label>
+                    <input type="date" id="date-input" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="time-input">Horário ideal</label>
+                    <input type="time" id="time-input" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                    Finalizar Agendamento ✨
+                </button>
+            </form>
+        </div>
+
+        <!-- SCREEN 4: SUCCESS / THANK YOU -->
+        <div class="screen" id="screen-thankyou">
+            <span class="emoji-header">💖✨</span>
+            <h1>Tudo Confirmado!</h1>
+            <p class="subtitle" style="margin-bottom: 2rem; color: #590d22; font-weight: 700;">Mal posso esperar por esse momento!</p>
+            
+            <div id="summary-preview" style="background-color: #ffe6ea; border-radius: 1.5rem; padding: 1.5rem; width: 100%; text-align: left; margin-bottom: 2rem; border: 2px dashed #ffccd5;">
+                <p style="color: #ff4d6d; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Resumo do Date:</p>
+                <p id="summary-place" style="font-weight: 700; color: #590d22; margin-bottom: 0.3rem; font-size: 1.1rem;">📍 Lugar: Jantar Romântico</p>
+                <p id="summary-date" style="font-weight: 700; color: #590d22; margin-bottom: 0.3rem;">📅 Data: 05/07/2026</p>
+                <p id="summary-time" style="font-weight: 700; color: #590d22;">⏰ Hora: 20:00</p>
+            </div>
+
+            <p style="color: #64748b; font-size: 0.85rem; font-weight: 600; margin-bottom: 1.5rem;">Obrigado por aceitar meu convite! 🥰</p>
+
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button class="btn" id="btn-back-to-home" style="flex: 1; padding: 0.8rem 1.2rem; font-size: 0.9rem; font-weight: 700; background-color: #f8fafc; border: 1px solid #cbd5e1; color: #475569; border-radius: 1rem; cursor: pointer; transition: all 0.2s;">
+                    Refazer Proposta
+                </button>
+                <button class="btn" id="btn-change-details" style="flex: 1; padding: 0.8rem 1.2rem; font-size: 0.9rem; font-weight: 700; background-color: rgba(255, 77, 109, 0.1); border: 1px solid rgba(255, 77, 109, 0.2); color: #ff4d6d; border-radius: 1rem; cursor: pointer; transition: all 0.2s;">
+                    Alterar Detalhes
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCREEN 2: CELEBRATION VIDEO (OUTSIDE FOR REAL VIEWPORT FIXED COVERAGE) -->
+    <div class="screen" id="screen-video">
+        <div class="video-wrapper">
+            <!-- Autoplay works reliably since the user explicitly clicked the SIM button -->
+            <video 
+                id="celebration-video"
+                src="/celebration.mp4" 
+                preload="auto"
+                autoplay 
+                loop 
+                muted
+                playsinline>
+            </video>
+            <div class="overlay-vignette"></div>
+        </div>
+        
+        <div class="content-overlay">
+            <div style="margin-top: 1rem;">
+                <span class="emoji-header" style="font-size: 6rem; margin-bottom: 1rem;">🎉🥰</span>
+                <h1>Ebaaa! ❤️</h1>
+                <p class="subtitle" style="margin-bottom: 0;">Prepare-se para o melhor date de todos!</p>
+            </div>
+
+            <button class="btn btn-primary" id="btn-to-planning" style="margin-bottom: 1rem; padding: 1.1rem 2.5rem; font-size: 1.25rem; font-weight: 800; border: 2px solid rgba(255,255,255,0.4); max-width: 380px; width: 90%;">
+                Continuar para o Planejamento 🌹
+            </button>
+        </div>
+    </div>
+
+    <!-- SECRET ADMIN AREA MODAL -->
+    <div class="admin-modal" id="admin-modal">
+        <div class="admin-box">
+            <div class="admin-header">
+                <h2>⚙️ Painel do Cupido (Admin)</h2>
+                <button class="admin-close" id="admin-close-btn">&times;</button>
+            </div>
+            <div class="admin-tabs">
+                <div class="admin-tab active" id="tab-active" onclick="switchTab('active')">Respostas Ativas</div>
+                <div class="admin-tab" id="tab-trash" onclick="switchTab('trash')">Lixeira</div>
+            </div>
+            <div class="admin-content" id="admin-list-container">
+                <!-- Dynamic cards render here -->
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="heart-shower" id="heart-shower-layer"></div>
+
+    <script>
+        // DOM Elements
+        const btnNo = document.getElementById('btn-no');
+        const btnYes = document.getElementById('btn-yes');
+        const screenProposal = document.getElementById('screen-proposal');
+        const screenVideo = document.getElementById('screen-video');
+        const screenPlanning = document.getElementById('screen-planning');
+        const screenThankyou = document.getElementById('screen-thankyou');
+        
+        const btnToPlanning = document.getElementById('btn-to-planning');
+        const btnBackToHome = document.getElementById('btn-back-to-home');
+        const btnChangeDetails = document.getElementById('btn-change-details');
+        const planningForm = document.getElementById('planning-form');
+        const placeCards = document.querySelectorAll('.form-select-card');
+        const customPlaceInput = document.getElementById('custom-place');
+        const dateInput = document.getElementById('date-input');
+        const timeInput = document.getElementById('time-input');
+
+        const summaryPlace = document.getElementById('summary-place');
+        const summaryDate = document.getElementById('summary-date');
+        const summaryTime = document.getElementById('summary-time');
+
+        // Admin Elements
+        const adminModal = document.getElementById('admin-modal');
+        const adminCloseBtn = document.getElementById('admin-close-btn');
+        const adminListContainer = document.getElementById('admin-list-container');
+
+        let selectedPlace = 'Jantar Romântico';
+        let currentAdminTab = 'active'; // 'active' or 'trash'
+        let editingResponseId = null;
+
+        // Set default minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+
+        // Interactive "NÃO" Button fleeing
+        let lastFleeTime = 0;
+        function flee(e) {
+            const now = Date.now();
+            if (now - lastFleeTime < 250) {
+                if (e && e.cancelable) {
+                    e.preventDefault();
+                }
+                return;
+            }
+            lastFleeTime = now;
+
+            if (e) {
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+                e.stopPropagation();
+            }
+
+            // Move the button to body to ignore transform and backdrop-filter issues
+            if (btnNo.parentElement !== document.body) {
+                document.body.appendChild(btnNo);
+            }
+
+            const btnWidth = btnNo.offsetWidth || 100;
+            const btnHeight = btnNo.offsetHeight || 45;
+
+            const padding = 20;
+            const maxW = window.innerWidth - btnWidth - padding * 2;
+            const maxH = window.innerHeight - btnHeight - padding * 2;
+
+            const randomX = Math.max(padding, Math.floor(Math.random() * maxW) + padding);
+            const randomY = Math.max(padding, Math.floor(Math.random() * maxH) + padding);
+
+            // Position fixed relative to viewport
+            btnNo.style.position = 'fixed';
+            btnNo.style.left = randomX + 'px';
+            btnNo.style.top = randomY + 'px';
+            btnNo.style.zIndex = '9999';
+        }
+
+        btnNo.addEventListener('mouseover', flee);
+        btnNo.addEventListener('touchstart', flee, { passive: false });
+        btnNo.addEventListener('click', (e) => {
+            e.preventDefault();
+            flee(e);
+        });
+
+        // Rain of falling hearts
+        function triggerHeartShower() {
+            const shower = document.getElementById('heart-shower-layer');
+            const emojis = ['❤️', '💖', '💕', '💗', '💓', '✨', '🌸', '🌹'];
+            
+            // Loop to produce hearts
+            for (let i = 0; i < 70; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'falling-heart';
+                    heart.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                    
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    const scale = 0.5 + Math.random() * 1.5;
+                    heart.style.transform = 'scale(' + scale + ')';
+                    
+                    const duration = 2.5 + Math.random() * 3.5;
+                    heart.style.animationDuration = duration + 's';
+                    heart.style.opacity = 0.5 + Math.random() * 0.5;
+
+                    shower.appendChild(heart);
+
+                    setTimeout(() => {
+                        heart.remove();
+                    }, duration * 1000);
+                }, i * 80);
+            }
+        }
+
+        // Action when SIM is clicked
+        btnYes.addEventListener('click', () => {
+            const mainCard = document.getElementById('main-card');
+            if (mainCard) {
+                mainCard.style.display = 'none';
+            }
+            screenProposal.classList.remove('active');
+            screenVideo.classList.add('active');
+            
+            // Hide the NO button if it was portaled/appended to the body
+            if (btnNo) {
+                btnNo.style.display = 'none';
+            }
+
+            // Ensure video plays (with sound if possible, since user clicked SIM)
+            const player = document.getElementById('celebration-video');
+            if (player) {
+                player.muted = false;
+                player.play().catch(err => {
+                    console.log("Playing unmuted video failed, fallback to muted:", err);
+                    player.muted = true;
+                    player.play().catch(e => console.log("Muted fallback also failed:", e));
+                });
+            }
+
+            // Background light pulses
+            document.body.style.transition = 'background-color 1.5s ease';
+            document.body.style.backgroundColor = '#ffe3e8';
+
+            triggerHeartShower();
+        });
+
+        // Navigate from video to planning
+        btnToPlanning.addEventListener('click', () => {
+            const mainCard = document.getElementById('main-card');
+            if (mainCard) {
+                mainCard.style.display = 'block';
+                mainCard.style.maxWidth = '480px';
+            }
+            // Stop local video audio by pausing it
+            const player = document.getElementById('celebration-video');
+            if (player) {
+                player.pause();
+            }
+
+            screenVideo.classList.remove('active');
+            screenPlanning.classList.add('active');
+        });
+
+        // Planning Form selection cards
+        placeCards.forEach(card => {
+            card.addEventListener('click', () => {
+                placeCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedPlace = card.getAttribute('data-value');
+                customPlaceInput.value = ''; // clear custom
+            });
+        });
+
+        customPlaceInput.addEventListener('input', () => {
+            if (customPlaceInput.value.trim() !== '') {
+                placeCards.forEach(c => c.classList.remove('selected'));
+                selectedPlace = customPlaceInput.value.trim();
+            } else {
+                // select first card as default fallback
+                const firstCard = placeCards[0];
+                firstCard.classList.add('selected');
+                selectedPlace = firstCard.getAttribute('data-value');
+            }
+        });
+
+        // Form Submit
+        planningForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const finalPlace = customPlaceInput.value.trim() !== '' ? customPlaceInput.value.trim() : selectedPlace;
+            const finalDate = dateInput.value;
+            const finalTime = timeInput.value;
+
+            // Formatted Date string
+            const dateParts = finalDate.split('-');
+            const formattedDate = dateParts[2] + '/' + dateParts[1] + '/' + dateParts[0];
+
+            // Save to localStorage
+            const newResponse = {
+                id: 'resp_' + Date.now(),
+                place: finalPlace,
+                date: formattedDate,
+                time: finalTime,
+                rawDate: finalDate, // kept for easy editing
+                timestamp: new Date().toLocaleString('pt-BR'),
+                status: 'active'
+            };
+
+            // Read existing responses
+            let responsesList = [];
+            try {
+                const stored = localStorage.getItem('respostas_date');
+                if (stored) {
+                    responsesList = JSON.parse(stored);
+                }
+            } catch(err) {
+                console.error(err);
+            }
+
+            responsesList.push(newResponse);
+            localStorage.setItem('respostas_date', JSON.stringify(responsesList));
+
+            // Populate Summary screen
+            summaryPlace.innerText = '📍 Lugar: ' + finalPlace;
+            summaryDate.innerText = '📅 Data: ' + formattedDate;
+            summaryTime.innerText = '⏰ Hora: ' + finalTime;
+
+            // Shift Screen
+            screenPlanning.classList.remove('active');
+            screenThankyou.classList.add('active');
+
+            // Celebrate again!
+            triggerHeartShower();
+        });
+
+        // Back to home & Change details actions
+        btnBackToHome.addEventListener('click', () => {
+            screenThankyou.classList.remove('active');
+            screenProposal.classList.add('active');
+
+            const mainCard = document.getElementById('main-card');
+            if (mainCard) {
+                mainCard.style.display = 'block';
+                mainCard.style.maxWidth = '480px';
+            }
+
+            // Reset NAO button position
+            if (btnNo) {
+                btnNo.style.position = '';
+                btnNo.style.left = '';
+                btnNo.style.top = '';
+                btnNo.style.zIndex = '';
+                btnNo.style.display = '';
+                if (btnNo.parentElement === document.body) {
+                    const buttonsDiv = document.querySelector('#screen-proposal .buttons');
+                    if (buttonsDiv) {
+                        buttonsDiv.appendChild(btnNo);
+                    }
+                }
+            }
+        });
+
+        btnChangeDetails.addEventListener('click', () => {
+            screenThankyou.classList.remove('active');
+            screenPlanning.classList.add('active');
+        });
+
+        // ==========================================
+        // SECRET ADMIN SECTION (CTRL + ALT)
+        // ==========================================
+        window.addEventListener('keydown', (e) => {
+            // Check if CTRL and ALT are pressed simultaneously
+            if (e.ctrlKey && e.altKey) {
+                e.preventDefault();
+                openAdmin();
+            }
+        });
+
+        function openAdmin() {
+            adminModal.style.display = 'flex';
+            renderAdminResponses();
+        }
+
+        adminCloseBtn.addEventListener('click', () => {
+            adminModal.style.display = 'none';
+        });
+
+        // Close modal clicking outside the box
+        adminModal.addEventListener('click', (e) => {
+            if (e.target === adminModal) {
+                adminModal.style.display = 'none';
+            }
+        });
+
+        function switchTab(tabName) {
+            currentAdminTab = tabName;
+            document.getElementById('tab-active').classList.toggle('active', tabName === 'active');
+            document.getElementById('tab-trash').classList.toggle('active', tabName === 'trash');
+            renderAdminResponses();
+        }
+
+        function getResponses() {
+            try {
+                const stored = localStorage.getItem('respostas_date');
+                return stored ? JSON.parse(stored) : [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function saveResponses(list) {
+            localStorage.setItem('respostas_date', JSON.stringify(list));
+        }
+
+        function renderAdminResponses() {
+            adminListContainer.innerHTML = '';
+            const allResponses = getResponses();
+            const filtered = allResponses.filter(r => {
+                if (currentAdminTab === 'active') {
+                    return r.status !== 'trash';
+                } else {
+                    return r.status === 'trash';
+                }
+            });
+
+            if (filtered.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-state';
+                emptyMsg.innerHTML = currentAdminTab === 'active' 
+                    ? '<span class="empty-icon">🧸</span> Nenhuma resposta registrada ainda.'
+                    : '<span class="empty-icon">🗑️</span> A lixeira está limpa.';
+                adminListContainer.appendChild(emptyMsg);
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'response-card';
+                card.id = 'card-' + item.id;
+
+                const isEditing = editingResponseId === item.id;
+
+                let contentHtml = '';
+                if (isEditing) {
+                    contentHtml = `
+                        <div class="response-meta">
+                            <span class="response-id">${item.id}</span>
+                            <span class="response-date-sub">Editando Resposta</span>
+                        </div>
+                        <div class="edit-input-group">
+                            <label style="font-size:0.75rem; font-weight:bold; color:#590d22;">LUGAR:</label>
+                            <input type="text" id="edit-place-${item.id}" class="edit-input" value="${item.place}">
+                            <label style="font-size:0.75rem; font-weight:bold; color:#590d22; margin-top:0.3rem;">DATA:</label>
+                            <input type="date" id="edit-date-${item.id}" class="edit-input" value="${item.rawDate || ''}">
+                            <label style="font-size:0.75rem; font-weight:bold; color:#590d22; margin-top:0.3rem;">HORA:</label>
+                            <input type="time" id="edit-time-${item.id}" class="edit-input" value="${item.time}">
+                        </div>
+                        <div class="response-actions">
+                            <button class="action-btn btn-restore" onclick="saveEditedResponse('${item.id}')">Salvar</button>
+                            <button class="action-btn btn-edit" onclick="cancelEditing()">Cancelar</button>
+                        </div>
+                    `;
+                } else {
+                    contentHtml = `
+                        <div class="response-meta">
+                            <span class="response-id">${item.id}</span>
+                            <span class="response-date-sub">${item.timestamp}</span>
+                        </div>
+                        <div class="response-detail">📍 Lugar: <strong>${item.place}</strong></div>
+                        <div class="response-detail">📅 Data: <strong>${item.date}</strong></div>
+                        <div class="response-detail">⏰ Horário: <strong>${item.time}</strong></div>
+                    `;
+
+                    if (currentAdminTab === 'active') {
+                        contentHtml += `
+                            <div class="response-actions">
+                                <button class="action-btn btn-edit" onclick="startEditing('${item.id}')">Editar</button>
+                                <button class="action-btn btn-delete" onclick="moveResponseToTrash('${item.id}')">Excluir</button>
+                            </div>
+                        `;
+                    } else {
+                        contentHtml += `
+                            <div class="response-actions">
+                                <button class="action-btn btn-restore" onclick="restoreResponse('${item.id}')">Restaurar</button>
+                                <button class="action-btn btn-danger" onclick="permanentlyDeleteResponse('${item.id}')">Excluir Permanentemente</button>
+                            </div>
+                        `;
+                    }
+                }
+
+                card.innerHTML = contentHtml;
+                adminListContainer.appendChild(card);
+            });
+        }
+
+        // Admin actions
+        window.startEditing = function(id) {
+            editingResponseId = id;
+            renderAdminResponses();
+        };
+
+        window.cancelEditing = function() {
+            editingResponseId = null;
+            renderAdminResponses();
+        };
+
+        window.saveEditedResponse = function(id) {
+            const placeVal = document.getElementById('edit-place-' + id).value.trim();
+            const rawDateVal = document.getElementById('edit-date-' + id).value;
+            const timeVal = document.getElementById('edit-time-' + id).value;
+
+            if (!placeVal || !rawDateVal || !timeVal) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+
+            const dateParts = rawDateVal.split('-');
+            const formattedDate = dateParts[2] + '/' + dateParts[1] + '/' + dateParts[0];
+
+            const list = getResponses();
+            const index = list.findIndex(r => r.id === id);
+            if (index !== -1) {
+                list[index].place = placeVal;
+                list[index].rawDate = rawDateVal;
+                list[index].date = formattedDate;
+                list[index].time = timeVal;
+                saveResponses(list);
+            }
+
+            editingResponseId = null;
+            renderAdminResponses();
+
+            // If we edited the one currently visible on the final screen, update it live!
+            if (screenThankyou.classList.contains('active')) {
+                summaryPlace.innerText = '📍 Lugar: ' + placeVal;
+                summaryDate.innerText = '📅 Data: ' + formattedDate;
+                summaryTime.innerText = '⏰ Hora: ' + timeVal;
+            }
+        };
+
+        window.moveResponseToTrash = function(id) {
+            const list = getResponses();
+            const index = list.findIndex(r => r.id === id);
+            if (index !== -1) {
+                list[index].status = 'trash';
+                saveResponses(list);
+            }
+            renderAdminResponses();
+        };
+
+        window.restoreResponse = function(id) {
+            const list = getResponses();
+            const index = list.findIndex(r => r.id === id);
+            if (index !== -1) {
+                list[index].status = 'active';
+                saveResponses(list);
+            }
+            renderAdminResponses();
+        };
+
+        window.permanentlyDeleteResponse = function(id) {
+            if (confirm('Deseja excluir permanentemente esta resposta? Esta ação não pode ser desfeita.')) {
+                let list = getResponses();
+                list = list.filter(r => r.id !== id);
+                saveResponses(list);
+                renderAdminResponses();
+            }
+        };
+    </script>
+</body>
+</html>
