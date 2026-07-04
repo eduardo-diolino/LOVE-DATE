@@ -72,6 +72,8 @@ export default function App() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
   const [videoError, setVideoError] = useState(false);
+  const [celebrationVideoSrc, setCelebrationVideoSrc] = useState('/celebration.mp4');
+  const celebrationVideoSources = ['/celebration.mp4', '/celebration-1.mp4'];
 
   // Load and sync responses from Firestore in real-time
   useEffect(() => {
@@ -123,27 +125,27 @@ export default function App() {
 
   // Handle robust video playback with sound or fallback to muted
   useEffect(() => {
-    if (step === 'celebration') {
-      if (videoRef.current) {
-        const video = videoRef.current;
-        if (video.paused) {
-          video.muted = false;
-          video.play().catch((err) => {
-            console.log("Autoplay unmuted was blocked by browser. Playing muted as fallback.", err);
-            video.muted = true;
-            video.play().catch((mutedErr) => {
-              console.warn("Muted playback also failed inside useEffect:", mutedErr);
-            });
-          });
+    if (videoRef.current) {
+      const video = videoRef.current;
+      if (step === 'celebration') {
+        if (video.src !== window.location.origin + celebrationVideoSrc) {
+          video.src = celebrationVideoSrc;
         }
-      }
-    } else {
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
+        video.muted = false;
+        video.currentTime = 0;
+        video.play().catch((err) => {
+          console.log("Autoplay unmuted was blocked by browser. Playing muted as fallback.", err);
+          video.muted = true;
+          video.play().catch((mutedErr) => {
+            console.warn("Muted playback also failed inside useEffect:", mutedErr);
+          });
+        });
+      } else {
+        video.pause();
+        video.currentTime = 0;
       }
     }
-  }, [step]);
+  }, [step, celebrationVideoSrc]);
 
   // Global keyboard listener for CTRL + ALT
   useEffect(() => {
@@ -238,23 +240,20 @@ export default function App() {
   };
 
   const handleYesClick = () => {
+    const nextVideoSrc = celebrationVideoSrc === celebrationVideoSources[0]
+      ? celebrationVideoSources[1]
+      : celebrationVideoSources[0];
+
     setVideoError(false);
+    setCelebrationVideoSrc(nextVideoSrc);
     setStep('celebration');
     triggerHeartShower();
 
-    // Synchronously request play to satisfy browser's strict user-interaction check!
     if (videoRef.current) {
       const video = videoRef.current;
+      video.src = nextVideoSrc;
       video.muted = false;
       video.currentTime = 0;
-      video.load(); // Force load the newly copied celebration.mp4!
-      video.play().catch((err) => {
-        console.warn("Unmuted autoplay synchronously blocked inside click handler, trying muted:", err);
-        video.muted = true;
-        video.play().catch((mutedErr) => {
-          console.error("Muted playback also blocked inside click handler:", mutedErr);
-        });
-      });
     }
   };
 
@@ -945,12 +944,14 @@ export default function App() {
 
       {/* Background Celebration Video - Kept in DOM to allow preloading and synchronous activation */}
       <video
+        key={celebrationVideoSrc}
         ref={videoRef}
         id="celebration-background-video"
         className={`fixed inset-0 w-screen h-screen object-cover pointer-events-none transition-opacity duration-1000 bg-black ${
           step === 'celebration' && !videoError ? 'opacity-100 z-[9800]' : 'opacity-0 -z-50'
         }`}
-        src="/celebration.mp4"
+        src={celebrationVideoSrc}
+        autoPlay
         loop
         playsInline
         preload="auto"
@@ -959,10 +960,23 @@ export default function App() {
           height: '100vh',
         }}
         onError={(e) => {
-          console.warn("Video failed to load or has unsupported sources, switching to elegant fallback background.", e);
-          if (videoRef.current && videoRef.current.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
-            setVideoError(true);
+          const video = e.currentTarget;
+          const fallbackSrc = celebrationVideoSrc === celebrationVideoSources[0]
+            ? celebrationVideoSources[1]
+            : celebrationVideoSources[0];
+
+          if (fallbackSrc && video.currentSrc !== fallbackSrc) {
+            video.src = fallbackSrc;
+            video.muted = true;
+            video.load();
+            video.play().catch(() => {
+              setVideoError(true);
+            });
+            return;
           }
+
+          console.warn("Video failed to load or has unsupported sources, switching to elegant fallback background.", e);
+          setVideoError(true);
         }}
       />
 
