@@ -17,7 +17,8 @@ import {
   MapPin, 
   X, 
   Edit3, 
-  HeartHandshake 
+  HeartHandshake,
+  Globe2 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { collection, query, orderBy, onSnapshot, doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
@@ -46,6 +47,7 @@ interface DateResponse {
 export default function App() {
   const [step, setStep] = useState<'proposal' | 'celebration' | 'planning' | 'thankyou'>('proposal');
   const [copied, setCopied] = useState(false);
+  const [language, setLanguage] = useState<'pt' | 'en'>('pt');
   const [noBtnPos, setNoBtnPos] = useState({ x: 0, y: 0, isFixed: false });
   const [heartParticles, setHeartParticles] = useState<HeartParticle[]>([]);
   const noBtnRef = useRef<HTMLButtonElement>(null);
@@ -53,7 +55,7 @@ export default function App() {
   const lastFleeTimeRef = useRef(0);
 
   // Form states
-  const [selectedPlace, setSelectedPlace] = useState('Jantar Romântico');
+  const [selectedPlace, setSelectedPlace] = useState('romantic-dinner');
   const [customPlace, setCustomPlace] = useState('');
   const [formDate, setFormDate] = useState('');
   const [formTime, setFormTime] = useState('');
@@ -75,7 +77,112 @@ export default function App() {
   const [celebrationVideoSrc, setCelebrationVideoSrc] = useState('/celebration.mp4');
   const celebrationVideoSources = ['/celebration.mp4', '/celebration-1.mp4'];
 
+  const translations = {
+    pt: {
+      proposalTitle: 'Quer ir em um date comigo? 🥺',
+      proposalSubtitle: 'Prometo que vai ser inesquecível! 🌹',
+      yes: 'SIM',
+      no: 'NÃO',
+      planningTitle: 'O Nosso Encontro',
+      planningSubtitle: 'Personalize os detalhes especiais!',
+      toWhere: 'Para onde vamos?',
+      placePlaceholder: 'Ou digite outro lugar que gostaria de ir',
+      bestDay: 'Melhor Dia',
+      idealTime: 'Horário Ideal',
+      finalizeButton: 'Finalizar Agendamento ✨',
+      thankyouTitle: 'Tudo Confirmado!',
+      thankyouSubtitle: 'Mal posso esperar por esse momento!',
+      summaryTitle: 'Resumo do Date:',
+      placeLabel: 'Lugar:',
+      dateLabel: 'Data:',
+      timeLabel: 'Hora:',
+      resetButton: 'Refazer Proposta',
+      changeButton: 'Alterar Detalhes',
+      celebrationTitle: 'Ebaaa! ❤️',
+      celebrationSubtitle: 'Prepare-se para o melhor date de todos!',
+      celebrationButton: 'Ir para o Planejamento!',
+      adminTitle: 'Painel do Cupido (Admin)',
+      activeResponses: 'Respostas Ativas',
+      trashResponses: 'Lixeira',
+      emptyActive: 'Nenhuma resposta registrada ainda.',
+      emptyTrash: 'A lixeira está vazia.',
+      editingResponse: 'Editando Resposta',
+      placeField: 'Lugar:',
+      dateField: 'Data:',
+      timeField: 'Hora:',
+      save: 'Salvar',
+      cancel: 'Cancelar',
+      edit: 'Editar',
+      delete: 'Excluir',
+      restore: 'Restaurar',
+      deleteForever: 'Excluir Permanentemente',
+      confirmDelete: 'Certeza?',
+      yesShort: 'Sim',
+      noShort: 'Não',
+      requiredFields: 'Por favor, preencha todos os campos!',
+      languageLabel: 'Idioma',
+      languageEn: 'EN',
+      languagePt: 'PT',
+    },
+    en: {
+      proposalTitle: 'Would you go on a date with me? 🥺',
+      proposalSubtitle: 'I promise it will be unforgettable! 🌹',
+      yes: 'YES',
+      no: 'NO',
+      planningTitle: 'Our Date Plan',
+      planningSubtitle: 'Personalize the special details!',
+      toWhere: 'Where are we going?',
+      placePlaceholder: 'Or type another place you would love to go',
+      bestDay: 'Best Day',
+      idealTime: 'Ideal Time',
+      finalizeButton: 'Finish Planning ✨',
+      thankyouTitle: 'Everything is Set!',
+      thankyouSubtitle: 'I cannot wait for this moment!',
+      summaryTitle: 'Date Summary:',
+      placeLabel: 'Place:',
+      dateLabel: 'Date:',
+      timeLabel: 'Time:',
+      resetButton: 'Start Over',
+      changeButton: 'Change Details',
+      celebrationTitle: 'Yesss! ❤️',
+      celebrationSubtitle: 'Get ready for the best date ever!',
+      celebrationButton: 'Go to Planning!',
+      adminTitle: 'Cupido Panel (Admin)',
+      activeResponses: 'Active Responses',
+      trashResponses: 'Trash',
+      emptyActive: 'No responses registered yet.',
+      emptyTrash: 'The trash is empty.',
+      editingResponse: 'Editing Response',
+      placeField: 'Place:',
+      dateField: 'Date:',
+      timeField: 'Time:',
+      save: 'Save',
+      cancel: 'Cancel',
+      edit: 'Edit',
+      delete: 'Delete',
+      restore: 'Restore',
+      deleteForever: 'Delete Permanently',
+      confirmDelete: 'Sure?',
+      yesShort: 'Yes',
+      noShort: 'No',
+      requiredFields: 'Please fill in all fields!',
+      languageLabel: 'Language',
+      languageEn: 'EN',
+      languagePt: 'PT',
+    },
+  };
+  const t = translations[language];
+
   // Load and sync responses from Firestore in real-time
+  useEffect(() => {
+    document.title = 'Love Date';
+    document.documentElement.lang = language === 'en' ? 'en' : 'pt-BR';
+    const appTitleMeta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+    if (appTitleMeta) {
+      appTitleMeta.setAttribute('content', 'Love Date');
+    }
+  }, [language]);
+
   useEffect(() => {
     const q = query(collection(db, 'respostas'), orderBy('criadoEm', 'desc'));
     
@@ -379,10 +486,10 @@ export default function App() {
 
   // Place presets
   const presets = [
-    { name: 'Jantar Romântico', icon: '🍝', label: 'Jantar' },
-    { name: 'Cafeteria Aconchegante', icon: '☕', label: 'Café' },
-    { name: 'Cinema & Pipoca', icon: '🍿', label: 'Cinema' },
-    { name: 'Passeio no Parque', icon: '🧺', label: 'Passeio' },
+    { id: 'romantic-dinner', name: 'Jantar Romântico', nameEn: 'Romantic Dinner', icon: '🍝', label: 'Jantar', labelEn: 'Dinner' },
+    { id: 'cozy-cafe', name: 'Cafeteria Aconchegante', nameEn: 'Cozy Café', icon: '☕', label: 'Café', labelEn: 'Café' },
+    { id: 'movie-night', name: 'Cinema & Pipoca', nameEn: 'Movie Night', icon: '🍿', label: 'Cinema', labelEn: 'Movie' },
+    { id: 'park-walk', name: 'Passeio no Parque', nameEn: 'Park Walk', icon: '🧺', label: 'Passeio', labelEn: 'Walk' },
   ];
 
   return (
@@ -396,6 +503,25 @@ export default function App() {
         <div className="absolute bottom-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '5s' }}>💖</div>
         <div className="absolute top-1/4 right-10 text-4xl animate-pulse">✨</div>
         <div className="absolute bottom-1/4 left-10 text-5xl animate-bounce" style={{ animationDuration: '7s' }}>🌷</div>
+      </div>
+
+      <div className="absolute top-4 right-4 z-20">
+        <div className="flex items-center gap-2 rounded-full border border-[#ffccd5] bg-white/90 px-3 py-2 shadow-sm">
+          <Globe2 className="w-4 h-4 text-[#ff4d6d]" />
+          <span className="text-xs font-semibold text-[#590d22]">{t.languageLabel}</span>
+          <button
+            onClick={() => setLanguage('en')}
+            className={`rounded-full px-2 py-1 text-xs font-bold transition ${language === 'en' ? 'bg-[#ff4d6d] text-white' : 'text-[#64748b] hover:bg-[#ffe6ea]'}`}
+          >
+            {t.languageEn}
+          </button>
+          <button
+            onClick={() => setLanguage('pt')}
+            className={`rounded-full px-2 py-1 text-xs font-bold transition ${language === 'pt' ? 'bg-[#ff4d6d] text-white' : 'text-[#64748b] hover:bg-[#ffe6ea]'}`}
+          >
+            {t.languagePt}
+          </button>
+        </div>
       </div>
 
       {/* Interactive Main Card */}
@@ -429,11 +555,11 @@ export default function App() {
                 </div>
                 
                 <h1 className="text-[#590d22] text-3xl md:text-4xl font-extrabold mb-2 tracking-tight">
-                  Quer ir em um date comigo? 🥺
+                  {t.proposalTitle}
                 </h1>
                 
                 <p className="text-[#ff4d6d] mb-10 font-bold text-sm md:text-base">
-                  Prometo que vai ser inesquecível! 🌹
+                  {t.proposalSubtitle}
                 </p>
 
                 <div className="flex justify-center items-center gap-6 min-h-[60px] w-full">
@@ -442,7 +568,7 @@ export default function App() {
                     onClick={handleYesClick}
                     className="px-10 py-3.5 bg-[#ff4d6d] text-white font-bold text-lg rounded-full shadow-[0_10px_15px_-3px_rgba(255,77,109,0.4)] hover:scale-110 hover:bg-[#ff758f] transition duration-200 cursor-pointer"
                   >
-                    SIM
+                    {t.yes}
                   </button>
 
                   {noBtnPos.isFixed ? (
@@ -462,7 +588,7 @@ export default function App() {
                         }}
                         className="px-10 py-3.5 bg-[#e2e8f0] text-[#64748b] border border-[#cbd5e1] font-bold text-lg rounded-full cursor-pointer select-none transition-none"
                       >
-                        NÃO
+                        {t.no}
                       </button>,
                       document.body
                     )
@@ -480,7 +606,7 @@ export default function App() {
                       }}
                       className="px-10 py-3.5 bg-[#e2e8f0] text-[#64748b] border border-[#cbd5e1] font-bold text-lg rounded-full cursor-pointer select-none transition-none"
                     >
-                      NÃO
+                      {t.no}
                     </button>
                   )}
                 </div>
@@ -497,36 +623,36 @@ export default function App() {
                 className="flex flex-col items-center w-full"
               >
                 <div className="text-5xl mb-4">📅🗺️</div>
-                <h1 className="text-[#590d22] text-2xl md:text-3xl font-extrabold mb-1">O Nosso Encontro</h1>
-                <p className="text-[#ff4d6d] text-xs md:text-sm font-semibold mb-8">Personalize os detalhes especiais!</p>
+                <h1 className="text-[#590d22] text-2xl md:text-3xl font-extrabold mb-1">{t.planningTitle}</h1>
+                <p className="text-[#ff4d6d] text-xs md:text-sm font-semibold mb-8">{t.planningSubtitle}</p>
 
                 <form onSubmit={handleFormSubmit} className="w-full text-left space-y-5">
                   <div>
                     <label className="block text-[#590d22] font-bold text-xs uppercase tracking-wider mb-2">
-                      Para onde vamos?
+                      {t.toWhere}
                     </label>
                     <div className="grid grid-cols-2 gap-3 mb-3">
                       {presets.map((item) => (
                         <div
-                          key={item.name}
+                          key={item.id}
                           onClick={() => {
-                            setSelectedPlace(item.name);
+                            setSelectedPlace(item.id);
                             setCustomPlace('');
                           }}
                           className={`border-2 rounded-2xl p-3 cursor-pointer text-center transition-all duration-200 flex flex-col items-center gap-1.5 ${
-                            selectedPlace === item.name && customPlace === ''
+                            selectedPlace === item.id && customPlace === ''
                               ? 'border-[#ff4d6d] bg-[#ffe6ea] scale-[1.02] text-[#590d22]'
                               : 'border-[#ffccd5] bg-white hover:border-[#ff4d6d]/50 text-gray-700'
                           }`}
                         >
                           <span className="text-2xl">{item.icon}</span>
-                          <span className="font-bold text-xs md:text-sm">{item.label}</span>
+                          <span className="font-bold text-xs md:text-sm">{language === 'en' ? item.labelEn : item.label}</span>
                         </div>
                       ))}
                     </div>
                     <input
                       type="text"
-                      placeholder="Ou digite outro lugar que gostaria de ir"
+                      placeholder={t.placePlaceholder}
                       value={customPlace}
                       onChange={(e) => setCustomPlace(e.target.value)}
                       className="w-full px-4 py-3 rounded-2xl border-2 border-[#ffccd5] focus:border-[#ff4d6d] outline-none text-sm font-semibold bg-white text-[#590d22] transition-colors"
@@ -535,7 +661,7 @@ export default function App() {
 
                   <div>
                     <label className="block text-[#590d22] font-bold text-xs uppercase tracking-wider mb-2">
-                      Melhor Dia
+                      {t.bestDay}
                     </label>
                     <div className="relative">
                       <input
@@ -551,7 +677,7 @@ export default function App() {
 
                   <div>
                     <label className="block text-[#590d22] font-bold text-xs uppercase tracking-wider mb-2">
-                      Horário Ideal
+                      {t.idealTime}
                     </label>
                     <input
                       type="time"
@@ -566,7 +692,7 @@ export default function App() {
                     type="submit"
                     className="w-full py-4 px-6 bg-[#ff4d6d] hover:bg-[#ff1a43] text-white font-extrabold rounded-2xl shadow-md hover:shadow-[#ff4d6d]/30 transition-all duration-200 text-center text-sm uppercase tracking-wider cursor-pointer mt-2"
                   >
-                    Finalizar Agendamento ✨
+                    {t.finalizeButton}
                   </button>
                 </form>
               </motion.div>
@@ -582,22 +708,22 @@ export default function App() {
                 className="flex flex-col items-center w-full"
               >
                 <div className="text-6xl mb-4">💖✨</div>
-                <h1 className="text-[#590d22] text-2xl md:text-3xl font-black mb-1">Tudo Confirmado!</h1>
-                <p className="text-[#ff4d6d] text-sm font-bold mb-6">Mal posso esperar por esse momento!</p>
+                <h1 className="text-[#590d22] text-2xl md:text-3xl font-black mb-1">{t.thankyouTitle}</h1>
+                <p className="text-[#ff4d6d] text-sm font-bold mb-6">{t.thankyouSubtitle}</p>
 
                 <div className="w-full bg-[#ffe6ea] border-2 border-dashed border-[#ffccd5] rounded-3xl p-5 md:p-6 text-left space-y-3 mb-6">
-                  <p className="text-[#ff4d6d] font-extrabold text-[0.7rem] uppercase tracking-widest">Resumo do Date:</p>
+                  <p className="text-[#ff4d6d] font-extrabold text-[0.7rem] uppercase tracking-widest">{t.summaryTitle}</p>
                   <p className="font-bold text-[#590d22] text-base flex items-center gap-2">
                     <MapPin className="w-5 h-5 text-[#ff4d6d] shrink-0" />
-                    <span>Lugar: {lastSubmitted.place}</span>
+                    <span>{t.placeLabel} {lastSubmitted.place}</span>
                   </p>
                   <p className="font-bold text-[#590d22] text-sm flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-[#ff4d6d] shrink-0" />
-                    <span>Data: {lastSubmitted.date}</span>
+                    <span>{t.dateLabel} {lastSubmitted.date}</span>
                   </p>
                   <p className="font-bold text-[#590d22] text-sm flex items-center gap-2">
                     <Clock className="w-5 h-5 text-[#ff4d6d] shrink-0" />
-                    <span>Hora: {lastSubmitted.time}</span>
+                    <span>{t.timeLabel} {lastSubmitted.time}</span>
                   </p>
                 </div>
 
@@ -609,13 +735,13 @@ export default function App() {
                     }}
                     className="flex-1 py-3 px-4 bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-600 font-bold rounded-xl text-xs cursor-pointer"
                   >
-                    Refazer Proposta
+                    {t.resetButton}
                   </button>
                   <button
                     onClick={() => setStep('planning')}
                     className="flex-1 py-3 px-4 bg-[#ff4d6d]/10 hover:bg-[#ff4d6d]/20 text-[#ff4d6d] font-bold rounded-xl text-xs cursor-pointer"
                   >
-                    Alterar Detalhes
+                    {t.changeButton}
                   </button>
                 </div>
               </motion.div>
@@ -678,10 +804,10 @@ export default function App() {
                 🎉🥰
               </div>
               <h1 className="text-white text-4xl md:text-6xl font-black mb-3 tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
-                Ebaaa! ❤️
+                {t.celebrationTitle}
               </h1>
               <p className="text-[#ff4d6d] text-lg md:text-2xl font-extrabold tracking-wide drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] uppercase text-center">
-                Prepare-se para o melhor date de todos!
+                {t.celebrationSubtitle}
               </p>
             </div>
 
@@ -691,7 +817,7 @@ export default function App() {
                 onClick={() => setStep('planning')}
                 className="w-full py-4.5 px-8 bg-[#ff4d6d] hover:bg-[#ff1a43] active:scale-95 text-white font-black text-xl rounded-2xl shadow-[0_20px_40px_-5px_rgba(255,77,109,0.5)] hover:shadow-[#ff4d6d]/70 transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer border-2 border-white/40"
               >
-                <span>Ir para o Planejamento!</span>
+                <span>{t.celebrationButton}</span>
                 <HeartHandshake className="w-6 h-6 animate-pulse text-white" />
               </button>
             </div>
@@ -743,7 +869,7 @@ export default function App() {
             >
               <div className="bg-[#ffe6ea] p-5 border-b border-[#ffccd5] flex justify-between items-center shrink-0">
                 <h3 className="font-extrabold text-[#590d22] text-lg md:text-xl flex items-center gap-2">
-                  <span>⚙️ Painel do Cupido (Admin)</span>
+                  <span>⚙️ {t.adminTitle}</span>
                 </h3>
                 <button
                   onClick={() => setShowAdmin(false)}
@@ -763,7 +889,7 @@ export default function App() {
                       : 'text-gray-500 border-transparent hover:text-gray-700'
                   }`}
                 >
-                  Respostas Ativas ({responses.filter(r => r.status !== 'trash').length})
+                  {t.activeResponses} ({responses.filter(r => r.status !== 'trash').length})
                 </button>
                 <button
                   onClick={() => setAdminTab('trash')}
@@ -773,7 +899,7 @@ export default function App() {
                       : 'text-gray-500 border-transparent hover:text-gray-700'
                   }`}
                 >
-                  Lixeira ({responses.filter(r => r.status === 'trash').length})
+                  {t.trashResponses} ({responses.filter(r => r.status === 'trash').length})
                 </button>
               </div>
 
@@ -784,8 +910,8 @@ export default function App() {
                     <p className="text-4xl mb-3">🧸</p>
                     <p className="text-sm">
                       {adminTab === 'active' 
-                        ? 'Nenhuma resposta registrada ainda.' 
-                        : 'A lixeira está vazia.'}
+                        ? t.emptyActive 
+                        : t.emptyTrash}
                     </p>
                   </div>
                 ) : (
@@ -800,11 +926,11 @@ export default function App() {
                           <div className="space-y-3">
                             <div className="flex justify-between items-center text-xs text-gray-500 pb-2 border-b border-dashed border-gray-200">
                               <span className="font-mono">ID: {item.id}</span>
-                              <span className="text-[#ff4d6d] font-bold uppercase tracking-wider">Editando Resposta</span>
+                              <span className="text-[#ff4d6d] font-bold uppercase tracking-wider">{t.editingResponse}</span>
                             </div>
                             <div className="space-y-3">
                               <div>
-                                <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">Lugar:</label>
+                                <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">{t.placeField}</label>
                                 <input
                                   type="text"
                                   value={editPlace}
@@ -813,7 +939,7 @@ export default function App() {
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">Data:</label>
+                                <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">{t.dateField}</label>
                                 <input
                                   type="date"
                                   value={editDate}
@@ -822,7 +948,7 @@ export default function App() {
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">Hora:</label>
+                                <label className="block text-xs font-bold text-gray-600 mb-1 uppercase">{t.timeField}</label>
                                 <input
                                   type="time"
                                   value={editTime}
@@ -841,13 +967,13 @@ export default function App() {
                                 onClick={cancelInlineEdit}
                                 className="px-3.5 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-full text-xs cursor-pointer"
                               >
-                                Cancelar
+                                {t.cancel}
                               </button>
                               <button
                                 onClick={() => saveInlineEdit(item.id)}
                                 className="px-3.5 py-1.5 bg-[#ff4d6d] hover:bg-[#ff1a43] text-white font-bold rounded-full text-xs cursor-pointer"
                               >
-                                Salvar
+                                {t.save}
                               </button>
                             </div>
                           </div>
@@ -859,15 +985,15 @@ export default function App() {
                             </div>
                             <div className="space-y-1.5">
                               <p className="font-semibold text-gray-700 text-sm flex items-center gap-2">
-                                <span className="text-gray-400">📍 Lugar:</span>
+                                <span className="text-gray-400">📍 {t.placeLabel}</span>
                                 <strong className="text-[#590d22]">{item.place}</strong>
                               </p>
                               <p className="font-semibold text-gray-700 text-sm flex items-center gap-2">
-                                <span className="text-gray-400">📅 Data:</span>
+                                <span className="text-gray-400">📅 {t.dateLabel}</span>
                                 <strong className="text-[#590d22]">{item.date}</strong>
                               </p>
                               <p className="font-semibold text-gray-700 text-sm flex items-center gap-2">
-                                <span className="text-gray-400">⏰ Hora:</span>
+                                <span className="text-gray-400">⏰ {t.timeLabel}</span>
                                 <strong className="text-[#590d22]">{item.time}</strong>
                               </p>
                             </div>
@@ -881,14 +1007,14 @@ export default function App() {
                                     className="px-3.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-full text-xs cursor-pointer flex items-center gap-1"
                                   >
                                     <Edit3 className="w-3 h-3" />
-                                    <span>Editar</span>
+                                    <span>{t.edit}</span>
                                   </button>
                                   <button
                                     onClick={() => handleMoveToTrash(item.id)}
                                     className="px-3.5 py-1.5 bg-[#ffe6ea] hover:bg-[#ffccd5] text-[#ff4d6d] font-bold rounded-full text-xs cursor-pointer flex items-center gap-1"
                                   >
                                     <Trash2 className="w-3 h-3" />
-                                    <span>Excluir</span>
+                                    <span>{t.delete}</span>
                                   </button>
                                 </>
                               ) : (
@@ -898,11 +1024,11 @@ export default function App() {
                                     className="px-3.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-full text-xs cursor-pointer flex items-center gap-1"
                                   >
                                     <RotateCcw className="w-3 h-3" />
-                                    <span>Restaurar</span>
+                                    <span>{t.restore}</span>
                                   </button>
                                   {deleteConfirmId === item.id ? (
                                     <div className="flex items-center gap-1.5 bg-rose-50 border border-rose-100 px-2.5 py-1 rounded-full text-xs">
-                                      <span className="text-[10px] text-rose-600 font-extrabold uppercase tracking-wide">Certeza?</span>
+                                      <span className="text-[10px] text-rose-600 font-extrabold uppercase tracking-wide">{t.confirmDelete}</span>
                                       <button
                                         onClick={() => {
                                           handlePermanentDelete(item.id);
@@ -910,13 +1036,13 @@ export default function App() {
                                         }}
                                         className="px-2 py-0.5 bg-rose-600 hover:bg-rose-700 text-white font-extrabold rounded-full text-[9px] uppercase cursor-pointer"
                                       >
-                                        Sim
+                                        {t.yesShort}
                                       </button>
                                       <button
                                         onClick={() => setDeleteConfirmId(null)}
                                         className="px-2 py-0.5 bg-gray-200 hover:bg-gray-300 text-gray-600 font-extrabold rounded-full text-[9px] uppercase cursor-pointer"
                                       >
-                                        Não
+                                        {t.noShort}
                                       </button>
                                     </div>
                                   ) : (
@@ -925,7 +1051,7 @@ export default function App() {
                                       className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-full text-xs cursor-pointer flex items-center gap-1"
                                     >
                                       <Trash2 className="w-3 h-3" />
-                                      <span>Excluir Permanentemente</span>
+                                      <span>{t.deleteForever}</span>
                                     </button>
                                   )}
                                 </>
